@@ -19,6 +19,65 @@ Or use shorthand triggers:
 
 ---
 
+## WeChat Topic Judgment Workflow
+
+This repository is also used to train topic-selection judgment for a WeChat
+Official Account. Keep this workflow small: make a forecast, receive comparable
+feedback, and update one judgment at a time.
+
+### Triggers
+
+- `记录选题：<话题>` or `topic: <topic>` -> run the Topic Decision Workflow
+- `记录结果：<topic_id>` or `result: <topic_id>` -> run the Topic Result Workflow
+- `复盘选题` or `review topics` -> run the Topic Review Workflow
+
+### Three Feedback Questions
+
+1. Did people choose to open it? Use delivered-read rate when available.
+2. Did people find it worth sharing or saving? Use shares and favorites per reader.
+3. Did it attract the right audience? Use new follows per 1,000 readers.
+
+Total reads and recommendation exposure are context, not proof that the original
+topic judgment was correct.
+
+### Topic Decision Workflow
+
+1. Create a stable `topic_id` in the form `YYYYMMDD-NN`.
+2. Before publication, create `raw/topic-decisions/<topic_id>-<slug>.md` from
+   `templates/topic-decision.md`.
+3. Capture the reason and low/medium/high forecasts for opening, sharing/saving,
+   and following. Do not demand extra fields.
+4. Treat the saved decision as immutable. Later changes belong in a result or
+   review record, never in the original forecast.
+5. Ingest it as a source page tagged `topic-decision`, preserving `topic_id`.
+
+### Topic Result Workflow
+
+1. Create `raw/topic-results/<topic_id>-result.md` from
+   `templates/topic-result.md`. Never add outcomes to the decision file.
+2. Accept a pasted export, screenshot transcription, counts, or calculated rates.
+   Missing metrics remain explicitly `unknown`.
+3. Calculate only when denominators exist:
+   - delivered-read rate = readers / delivered users
+   - share-save rate = (sharers + favorites) / readers
+   - follows per 1,000 readers = new follows / readers * 1000
+4. Compare with the forecast. Mark each judgment `supported`, `not supported`, or
+   `inconclusive`.
+5. Write one short update for the next selection. Never infer a stable rule from
+   one article.
+6. Ingest it as a source page tagged `topic-result`, preserving `topic_id` and
+   linking it to the paired decision page.
+
+### Topic Review Workflow
+
+Run after at least five results unless the user requests an earlier review.
+
+1. Read all decision/result pairs and group comparable topics.
+2. Identify judgments repeatedly supported, contradicted, or still uncertain.
+3. Update concept pages for recurring hypotheses with evidence, counterexamples,
+   confidence, and boundary conditions.
+4. Save a synthesis only with user approval. End with one hypothesis to test next.
+
 ## Directory Layout
 
 ```
@@ -55,6 +114,19 @@ last_updated: YYYY-MM-DD
 ```
 
 Use `[[PageName]]` wikilinks to link to other wiki pages.
+
+### Obsidian Compatibility
+
+- Keep every wiki page filename stem unique across `wiki/`.
+- Internal knowledge links must use the exact filename stem: `[[PageName]]`.
+- Do not use path-qualified links such as `[[concepts/PageName]]`.
+- Do not use aliases or heading/block links such as `[[PageName|label]]`,
+  `[[PageName#Heading]]`, or `[[PageName^block]]`; the current lint and graph
+  tools treat those as different page names.
+- Standard Markdown links may be used for index navigation, attachments, and
+  external URLs, but only `[[PageName]]` links become knowledge-graph edges.
+- Obsidian is a viewing and exploration layer. Preserve the rule that `raw/`
+  source records are immutable after creation.
 
 ---
 
