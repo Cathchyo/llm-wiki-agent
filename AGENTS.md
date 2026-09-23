@@ -19,6 +19,18 @@ Or use shorthand triggers:
 
 ---
 
+## 输出风格
+
+- **结论优先**：开头直接说明结果或核心判断，不先复述问题和过程。
+- **精简准确**：使用短句和具体措辞，删除客套话、重复内容及无关背景。
+- **重点突出**：按重要性排列信息；核心观点尽量控制在 3 条以内。
+- **便于扫描**：复杂内容使用简短列表；必要时用加粗标出关键词，避免过度排版。
+- **按需展开**：默认只提供理解和决策所需的信息，用户要求时再补充细节。
+- **明确状态**：执行任务后简要说明完成了什么、验证结果以及仍存在的风险或阻塞。
+- **不牺牲完整性**：精简不能遗漏关键限制、风险、错误或需要用户决定的事项。
+
+---
+
 ## WeChat Topic Judgment Workflow
 
 This repository is also used to train topic-selection judgment for a WeChat
@@ -82,6 +94,7 @@ Run after at least five results unless the user requests an earlier review.
 
 ```
 raw/          # Immutable source documents — never modify these
+review/       # Human-review staging area — nothing here is part of the wiki yet
 wiki/         # Agent owns this layer entirely
   index.md    # Catalog of all pages — update on every ingest
   log.md      # Append-only chronological record
@@ -130,11 +143,29 @@ Use `[[PageName]]` wikilinks to link to other wiki pages.
 
 ---
 
+## Wiki 入库人工审核门禁
+
+任何内容从原始文档进入 `wiki/` 前，都必须经过用户逐步审核。未经明确批准，不得创建或修改 `wiki/` 页面，也不得更新 `wiki/index.md`、`wiki/overview.md` 或 `wiki/log.md`。
+
+按以下顺序执行，每一步完成后必须停止并等待用户审核：
+
+1. **原始资料准备**：读取或转换文件并放入 `raw/`，报告文件和转换状态；等待用户确认原始资料完整、可读。
+2. **预读摘要**：在 `review/` 中创建待审摘要，优先说明背景和任务，简述行动与结果；等待用户审核事实和表述。
+3. **入库方案**：摘要获批后，在 `review/` 中列出拟创建或修改的来源页、实体页、概念页、链接、标签、概览和矛盾记录；等待用户逐项批准。
+4. **正式入库**：只有用户明确表示“审核通过”“批准进入 Wiki”或同等意思后，才能把已批准内容写入 `wiki/` 并更新索引、概览和日志。
+5. **入库后校验**：完成结构检查并向用户提交变更摘要；不得在校验阶段擅自加入未经审核的新判断。
+
+用户提出修改意见只表示需要修订，不等同于批准。修订稿仍须保留在 `review/`，再次获得明确批准后才能进入下一步。若一次处理多篇文档，可以合并成一个审核文件，但每篇文档的结论必须能被单独审核。
+
+---
+
 ## Ingest Workflow
 
 Triggered by: *"ingest <file>"*
 
 **Supported formats:** Markdown (`.md`) is ingested directly. Non-markdown files (`.pdf`, `.docx`, `.pptx`, `.xlsx`, `.html`, `.txt`, `.csv`, `.json`, `.xml`, `.rst`, `.rtf`, `.epub`, `.ipynb`, `.yaml`, `.yml`, `.tsv`, `.wav`, `.mp3`) are auto-converted to markdown via [markitdown](https://github.com/microsoft/markitdown) before ingestion. Use `--no-convert` to skip auto-conversion.
+
+The steps below are the formal promotion phase. Run them only after completing the mandatory human-review gates above and receiving explicit approval.
 
 Steps (in order):
 1. Read the source document fully (auto-convert if non-markdown)
