@@ -1,0 +1,170 @@
+Remote Sensing of Environment 282 (2022) 113266
+
+Contents lists available at ScienceDirect
+
+Remote Sensing of Environment
+journal homepage: www.elsevier.com/locate/rse
+
+Review
+
+Remote sensing of land change: A multifaceted perspective
+Zhe Zhu *, Shi Qiu *, Su Ye *
+Department of Natural Resources and the Environment, University of Connecticut, Storrs, CT 06269, USA
+
+A R T I C L E I N F O
+
+A B S T R A C T
+
+Edited by Dr Marie Weiss
+
+The discipline of land change science has been evolving rapidly in the past decades. Remote sensing played a
+major role in one of the essential components of land change science, which includes observation, monitoring,
+and characterization of land change. In this paper, we proposed a new framework of the multifaceted view of
+land change through the lens of remote sensing and recommended five facets of land change including change
+location, time, target, metric, and agent. We also evaluated the impacts of spatial, spectral, temporal, angular,
+and data-integration domains of the remotely sensed data on observing, monitoring, and characterization of
+different facets of land change, as well as discussed some of the current land change products. We recommend
+clarifying the specific land change facet being studied in remote sensing of land change, reporting multiple or all
+facets of land change in remote sensing products, shifting the focus from land cover change to specific change
+metric and agent, integrating social science data and multi-sensor datasets for a deeper and fuller understanding
+of land change, and recognizing limitations and weaknesses of remote sensing in land change studies.
+
+Keywords:
+Land change
+Change agent
+Change metric
+Change target
+Land cover change
+Land disturbance
+Climate variability
+Climate change
+Succession
+Time series
+
+1. Introduction
+With the increasing contemporary concerns on climate change,
+global environmental change, and sustainability, land change science
+has emerged as a unique science direction for addressing these chal­
+lenging issues (Gutman et al., 2004; Rindfuss et al., 2004; Turner et al.,
+2007). Land change science, defined as “the interdisciplinary field [that]
+seeks to understand the dynamics of land cover and land use as a
+coupled human-environment system to address theory, concepts,
+models, and applications relevant to environmental and societal prob­
+lems, including the intersection of the two” (Turner et al., 2007), has
+many components, in which one of the most fundamental and critical
+components is the observation, monitoring, and characterization of land
+change.
+The terrestrial surface of the Earth has been changing at an un­
+precedented rate. More than half of the Earth’s ice-free land surface has
+been modified by humans (Ellis et al., 2010), and almost all land sur­
+faces have been influenced by climate change and various kinds of land
+disturbances (Dale, 1997; Potter et al., 2003). Remote sensing, partic­
+ularly satellite remote sensing, that can provide synoptic and repeated
+measurements of the global land surface at different spectral, spatial,
+and temporal resolutions, is of great importance for studying global land
+change (Justice et al., 1998; Roy et al., 2014; Sellers et al., 1995). In the
+
+past decades, big advancements have been made in large-scale mapping
+of land change based on remote sensing data, due to the rapidly growing
+amounts of earth observation satellites (Belward and Skøien, 2015; Ustin
+and Middleton, 2021), the free and open data policy (Woodcock et al.,
+2008; Wulder et al., 2012; Zhu et al., 2019), the analysis-ready data
+format (Dwyer et al., 2018; Frantz, 2019), the state-of-art cloud
+computing platform that not only provides massive parallel computing
+capability but also a huge amount of online datasets (Gorelick et al.,
+2017), and the improved capability of new algorithms for land change
+detection (Banskota et al., 2014; Kennedy et al., 2014; Zhu, 2017).
+Recently, a paradigm shift from change detection of two points in time
+to monitoring and tracking change continuously in time is observed in
+the remote sensing community, where the use of dense time-series ob­
+servations gain more popularity with a capability of retrieving new land
+change information, such as subtle changes in ecosystem health and
+condition, and long-term trend of the vegetation productivity (Wood­
+cock et al., 2020). Moreover, land change information can now be
+monitored in near real-time (Shang et al., 2022; Tang et al., 2020;
+Verbesselt et al., 2012; Xin et al., 2013; Ye et al., 2021a), which greatly
+improves its value to resource managers and policymakers. We have also
+witnessed a proliferation of land change characterization algorithms
+(Zhu, 2017), mostly focusing on the “from-to” information, that is, land
+cover and/or land use information before and after the change (Hansen
+
+* Corresponding authors.
+E-mail addresses: zhe@uconn.edu (Z. Zhu), shi.qiu@uconn.edu (S. Qiu), su.ye@uconn.edu (S. Ye).
+https://doi.org/10.1016/j.rse.2022.113266
+Received 26 February 2022; Received in revised form 28 August 2022; Accepted 7 September 2022
+Available online 7 October 2022
+0034-4257/© 2022 The Authors. Published by Elsevier Inc. This is an open access article under the CC BY license (http://creativecommons.org/licenses/by/4.0/).
+
+Z. Zhu et al.
+
+Remote Sensing of Environment 282 (2022) 113266
+
+and Loveland, 2012; Pricope et al., 2019). It should be noted that though
+“land cover” (the physical properties at the Earth’s surface) and “land
+use” (the social, economic, and cultural utility of land) are quite distinct
+(Turner, 1997), they are often grouped together in remote sensing
+products, and “land cover” is usually used as a surrogate for under­
+standing “land use”, such as including cropland and developed land in
+the categories of land cover (Anderson et al., 1976). Considering remote
+sensing data provide information on land cover, rather than on land use,
+we will mainly focus on land cover change hereafter.
+In this paper, we propose the framework of a multifaceted perspec­
+tive in remote sensing of land change, in which the change in land cover
+is only one of the components viewed from one of the five facets of land
+change - the target of change or what is changing. Basically, if we detect
+change in satellite spectral bands, we can extract the land change in­
+formation to answer five different questions, that are, when (change
+time), where (change location), what (change target), how (change
+metric), and why (change agent) the change happened. Each of the
+questions will occupy one facet of the change cube that contains the
+spectral change information derived from remotely sensed data (Fig. 1).
+The facet on the top of the change cube is left empty on purpose, as there
+may be other facets of land change that are not discussed in this paper.
+The two facets of “Time” and “Location” provide information on the
+detection and monitoring of land change, and the other three facets of
+“Target”, “Metric”, and “Agent” are related to the characterization of
+land change. Indeed, the topic of land change has been extensively
+reviewed in the remote sensing community, but most focused on change
+detection techniques (i.e., when and where) (Coppin et al., 2004; Hus­
+sain et al., 2013; Lu et al., 2004; Singh, 1989; Zhu, 2017). Only very few
+reviews mentioned other facets such as change target (Hansen and
+Loveland, 2012; Warner et al., 2009; Wulder et al., 2018), change metric
+(Gómez et al., 2016; Kennedy et al., 2009; Vogelmann et al., 2016), and
+change agent (Kennedy et al., 2015; Sebald et al., 2021; Shimizu et al.,
+
+2019). Pouliot and Latifovic (2016) mapped the multifaceted nature of
+land change, however, it was only a case study in the Athabasca oil sands
+region of Canada and has not reviewed the multifaceted land change in a
+systematic way. According to our knowledge, this paper is the first work
+for synopsizing the detection and characterization of land change as a
+five-facet task in a systematic manner, paving the way for operational­
+izing a holistic examination of land change as well as accomplishing
+efficient communication on related concepts - rather than a synthesis of
+sensor or methodological comparison which has been widely touched in
+previous works.
+We will first discuss all five facets of land change as well as their
+relationship through the lens of remote sensing. Next, we will discuss the
+remote sensing issues in spectral, spatial, temporal, angular, and dataintegration domains in observing, monitoring, and characterization of
+different facets of land change. Finally, we will discuss some of the
+current land change products derived from remote sensing data and
+conclude with a few recommendations. While most examples of this
+paper were illustrated using time-series datasets given by our expertise
+on this topic, we do appreciate the spatial and spectral merits of other
+data types (e.g., LiDAR, Hyperspectral, and Unmanned Aerial Vehicle
+(UAV)), which are equally important for characterizing land change. It
+has been our recognition that the integration of multiple data sources
+can provide a unique opportunity for the success of monitoring multi­
+faced land change (will be discussed in Section 4.5).
+2. The five facets of land change
+If the remote sensing system is well designed for capturing the spe­
+cific land change type, it is possible to extract land change information
+for five different facets based on the remotely sensed observations
+collected before, during, and/or after the land change (Fig. 2).
+
+Fig. 1. The five facets proposed for observation, monitoring, and characterization of land change using remotely sensed data. It is worth noting that not all land
+change agents will lead to a change in change target or land cover in this case, and some of the change patches displayed in the other four facets are not shown (e.g.,
+stress, flooding, and agriculture activity) or only partially shown (e.g., wind, construction, and regrowth) in the facet of change target.
+
+2
+
+

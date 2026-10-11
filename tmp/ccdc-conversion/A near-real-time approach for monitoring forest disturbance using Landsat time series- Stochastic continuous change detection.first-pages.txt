@@ -1,0 +1,234 @@
+Remote Sensing of Environment 252 (2021) 112167
+
+Contents lists available at ScienceDirect
+
+Remote Sensing of Environment
+journal homepage: www.elsevier.com/locate/rse
+
+A near-real-time approach for monitoring forest disturbance using Landsat
+time series: stochastic continuous change detection
+Su Ye a, *, John Rogan a, Zhe Zhu b, J. Ronald Eastman c
+a
+
+Graduate School of Geography, Clark University, 950 Main Street, Worcester, MA 01610, USA
+Department of Natural Resources and the Environment, University of Connecticut, Storrs, CT 06269, USA
+c
+Clark Labs, Clark University, Worcester, MA 01610, USA
+b
+
+A R T I C L E I N F O
+
+A B S T R A C T
+
+Keywords:
+Time series analysis
+Forest disturbance
+State space model
+Kalman filter
+Landsat
+Near real-time
+
+Forest disturbances greatly affect the ecological functioning of natural forests. Timely information regarding
+extent, timing and magnitude of forest disturbance events is crucial for effective disturbance management
+strategies. Yet, we still lack accurate, near-real-time and high-performance remote sensing tools for monitoring
+abrupt and subtle forest disturbances. This study presents a new approach called ‘Stochastic Continuous Change
+Detection (S-CCD)’ using a dense Landsat data time series. S-CCD improves upon the ‘COntinuous monitoring of
+Land Disturbance (COLD)’ approach by incorporating a mathematical tool called the ‘state space model’, which
+treats trends and seasonality as stochastic processes, allowing for modeling temporal dynamics of satellite ob­
+servations in a recursive way. The quantitative accuracy assessment is evaluated based on 3782 Landsat-based
+disturbance reference plots (30 m) from a probability sampling distributed throughout the Conterminous
+United States. Validation results show that the overall accuracy (best F1 score) of S-CCD is 0.793 with 20%
+omission error and 21% commission error, slightly higher than that of COLD (0.789). Two disturbance sites
+respectively associated with wildfire and insect disturbances are used for qualitative map-based analysis. Both
+quantitative and qualitative analyses suggest that S-CCD achieves fewer omission errors than COLD for detecting
+those disturbances with subtle/gradual spectral change. In addition, S-CCD facilitates a better real-time moni­
+toring, benefited by its complete recursive manner and a shorter lag for confirming disturbance than COLD (126
+days vs. 166 days for alerting 50% disturbance events), and reached up to ~4.4 times speedup for computation.
+This research addresses the need for near-real-time monitoring and large-scale mapping of forest health and
+offers a new approach for operationally performing change detection tasks from dense Landsat-based time series.
+
+1. Introduction
+
+disturbance in an accurate and timely manner, enabling an early
+warning and effective management to prevent further loss of forested
+land (Rogan and Mietkiewicz, 2015).
+For decades, satellite remote sensing has been promoted as a key
+data source for operational forest monitoring (Pasquarella et al., 2017).
+Particularly, the opening of the Landsat archive (Woodcock et al., 2008)
+has led to improved opportunities for characterizing forest disturbances
+from a long-term and consistent Landsat time series (Zhu, 2017).
+Compared to coarse-resolution datasets such as Moderate Resolution
+Imaging Spectroradiometer (MODIS, 250–1000 m resolution), Landsatbased time series are provided in a sufficient temporal length of 40-year
+global record of finer-resolution observations (30 m) (Masek et al.,
+2013). Therefore, Landsat data are often perceived as the best freeaccess remotely sensed data source for resolving the full range of
+
+In the last two decades, linked to the recent elevated air temperature
+and prolonged drought, an increase in the occurrence and severity of
+forest disturbance has been documented over large parts of the globe
+(Dale et al., 2001; Seidl et al., 2017; Turner et al., 1998) for such as
+insect outbreak (Kautz et al., 2017; Paritsis and Veblen, 2011),wildfire
+(Pechony and Shindell, 2010; Westerling, 2016) and drought (Allen
+et al., 2015). Forest disturbance events directly emit carbon to the at­
+mosphere through oxidation and decomposition of wood (Masek et al.,
+2008), and yield significant impacts on ecosystem services of national
+forests such as climate regulation and biological diversity conservation
+(Curran and Trigg, 2006). Therefore, it is important to systematically
+gather information regarding the extent, timing and magnitude of forest
+
+* Corresponding author.
+E-mail address: sye@clarku.edu (S. Ye).
+https://doi.org/10.1016/j.rse.2020.112167
+Received 22 March 2020; Received in revised form 14 September 2020; Accepted 26 October 2020
+Available online 5 November 2020
+0034-4257/© 2020 The Authors.
+Published by Elsevier Inc.
+This is an open
+(http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+access
+
+article
+
+under
+
+the
+
+CC
+
+BY-NC-ND
+
+license
+
+S. Ye et al.
+
+Remote Sensing of Environment 252 (2021) 112167
+
+disturbance occurrence (Cohen et al., 2017; Cohen et al., 2016; Kennedy
+et al., 2014; Ye et al., 2018). Recently, the release of Landsat Analysis
+Ready Data (ARD) has eased automation for monitoring large-scale
+forest disturbances (Dwyer et al., 2018). The Landsat ARD gridded all
+available Landsat-4 and -5 TM, Landsat-7 ETM+ and Landsat-8 OLI/
+TIRS to an Albers Equal Area (AEA) Conic map projection, and are
+consistently geo-registered and atmospherically corrected, and hence
+holds the highest level of scientific standards and processing required for
+immediate use (Zhu, 2019). The Landsat ARD requires the minimum of
+user effort for data preprocessing, greatly facilitating a large-scale and
+long-term time series analyses (Dwyer et al., 2018).
+A wealth of methodologies on satellite-based time series analysis
+have been developed for land cover change detection and character­
+ization (Kennedy et al., 2010; Verbesselt et al., 2010a; Zhu and Wood­
+cock, 2014b; Zhu et al., 2012). These approaches are often categorized
+based upon their monitoring strategies: offline or online monitoring
+(Bullock et al., 2019; Zhu, 2017). Offline monitoring focuses on a
+retrospective analysis when the collection of time series data is
+completed, and seeks to reconstruct forest disturbance history. The
+representative approaches for this category include LandTrendr (Ken­
+nedy et al., 2010), DBEST (Jamali et al., 2015) and the ensemble
+approach (Bullock et al., 2019). Online monitoring is applied to a
+practical scenario that the new observations are successively collected
+and processed in a timely fashion, and hence can be used for near realtime monitoring. Representative approaches for online monitoring are
+Breaks for Additive Season and Trend Monitor (BFAST Monitor) algo­
+rithm (Verbesselt et al., 2012) and Continuous Change Detection and
+Classification (CCDC) (Zhu and Woodcock, 2014b; Zhu et al. (2020)),
+though they are also applicable for offline monitoring. The BFAST was
+originally designed for temporal segmentation of MODIS-based time
+series (Verbesselt et al., 2010a), and was later modified (BFAST
+Monitor) to address near real-time detection for drought-related vege­
+tation disturbance (Verbesselt et al., 2012). BFAST Monitor is a uni­
+variate approach that uses a single spectral band or index, while it has
+been reported that multiple bands or indices are more preferable
+because forest disturbance has a multi-spectral expression requiring
+multi-band inputs (Cohen et al., 2017; Zhu et al. (2020)).
+CCDC is a multivariate time-series model that uses all available
+Landsat 4–8 data for change characterization and land cover classifi­
+cation (Zhu and Woodcock, 2014b). The CCDC first applies the Fmask
+(Zhu and Woodcock, 2012) and Tmask algorithm (Zhu and Woodcock,
+2014a) to screen clouds, cloud shadows and snow, and then build a
+harmonic model for each spectral band based on remaining clear ob­
+servations. A breakpoint indicative of the timing of the disturbance is
+identified when the minimum discrepancy between actual and predicted
+reflectance of spectral bands for a monitoring window is greater than a
+predefined change threshold (Zhu and Woodcock, 2014b). Recently, an
+improved algorithm called ‘COntinuous Monitoring of Land Dis­
+turbance’(COLD) was developed based upon CCDC Zhu et al. (2020).
+COLD introduced several improvements such as disturbance extraction,
+temporally-adjusted Root Mean Square Error (RMSE), and change an­
+gles for disturbance confirmation Zhu et al. (2020). An important
+finding for COLD is that using the highest frequency for harmonic model
+updates, that is per observation instead of per a time span for the CCDC,
+can reduce ~20% commission errors Zhu et al. (2020). Zhu et al. (2020)
+tested the performance of COLD using 7200 Landsat time series plots
+randomly selected across the conterminous United States, and reported
+that the COLD algorithm achieves a higher accuracy than CCDC (~20%
+commission and ~ 82% omission, see (Cohen et al., 2017), with 27%
+omission and 28% commission error for a variety of land disturbance
+types.
+However, while the COLD algorithm has achieved improved per­
+formance for change detection accuracy, there are several issues limiting
+its implementation for operational monitoring. First, COLD is compu­
+tationally expensive: the original MATLAB software takes ~5000
+computing hours for a Landsat ARD tile (1–3 thousand images) based on
+
+our tests. The high computational requirement imposes limits on the
+application of COLD for a wide range of scientific research, especially for
+a large-area mapping such as at a state or continental scale. The cause for
+the slow speed is due to the per observation updating approach Zhu et al.
+(2020). For example, if the time series of a single pixel has 500 clear
+observations, COLD needs to re-train the model using the ‘Least Absolute
+Shrinkage and Selection Operator’ (LASSO) algorithm for approximately
+500 times to complete a detection for this pixel. Computational re­
+dundancies arise from reconstructing models from scratch for each new
+observation being added to the time series. Second, the former version of
+COLD, namely CCDC, was designed to detect abrupt land cover change,
+and is less helpful for detecting those disturbances that yield small to
+medium spectral change magnitude (Brown et al., 2019; Cohen et al.,
+2017; Zhu et al. (2020)). A possible reason provided is that CCDC
+identifies gradual changes as the slope in the harmonic regression model
+as opposed to attributing them to a change on a specific date (Bullock
+et al., 2019). Though this issue was alleviated by COLD, it has not been
+fully solved yet as evident by the only 60% producer accuracy for the
+disturbance category ‘stress’ Zhu et al. (2020). Third, within the current
+workflow of COLD, near real-time monitoring is not fully operational
+because: 1) COLD is a memory-intensive algorithm which requires
+loading all images to update model coefficients and to calculate
+temporally-adjusted RMSE for each new observation; 2) certain steps of
+COLD such as minimum RMSE require data inputs collected after the
+current monitoring date, which does not satisfy the need of near realtime monitoring. A recursive transformation for these steps can free
+the system from loading all historical images each time for a new
+observation, greatly improving computational efficiency for a near realtime scenario.
+Currently, most operational near real-time products are based on
+MODIS system, such as Terra-i (Reymondin et al., 2012) and FORMA
+alert system (Hammer et al., 2014). To our knowledge, Global Land
+Analysis and Discovery (GLAD) is the only operational system providing
+a near real-time monitoring of forested land at a Landsat-pixel scale
+(Hansen et al., 2016). GLAD applies pre-trained decision trees models to
+classify clear observations and labels an alert if two or more out of four
+consecutive observations were classified into the disturbance category.
+As this product is designed and implemented only for tropical evergreen
+forest and no phenological variation is considered in the system (Hansen
+et al., 2016), its performance is unknown yet for those middle/highlatitude regions where disturbances signals are often spectrally similar
+to seasonal leaf drop.
+In this study, we describe a new algorithm called ‘Stochastic
+Continuous Change Detection’ (S-CCD) that is developed to universally
+detect forest disturbance from Landsat time series in a recursive fashion.
+S-CCD introduces the state space theory into the current framework of
+COLD, aiming to address three objectives: 1) to enhance detection ac­
+curacy, especially for those forest change with small spectral change
+magnitudes while keeping a low rate for commission errors; 2) to pro­
+vide an operational framework for near real-time monitoring; and 3) to
+improve computational efficiency, enabling a long-term time series
+analysis for a large-area forest disturbance characterization.
+In what follows, we first provide an intuitive explanation for state
+space models and the Kalman filter as the mathematical foundation of SCCD (Section 2), describe our S-CCD algorithm focusing on different
+steps with COLD (Section 3), introduce our reference dataset and vali­
+dation metrics (Section 4) and exhibit the results for both quantitative
+and qualitative evaluation (Section 5), and finally discuss advantages
+and future work for S-CCD (Section 6). Of particular note is that Section
+5.3 presents a high-performance software package for both S-CCD and
+COLD implemented in C language.
+2. State space model and the Kalman filter
+The new approach built upon the State Space Model (SSM), an
+established time-series mathematical framework that allows for
+2
+
+

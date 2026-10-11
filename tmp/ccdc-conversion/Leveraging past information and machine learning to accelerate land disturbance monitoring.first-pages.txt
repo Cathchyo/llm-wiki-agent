@@ -1,0 +1,210 @@
+Remote Sensing of Environment 305 (2024) 114071
+
+Contents lists available at ScienceDirect
+
+Remote Sensing of Environment
+journal homepage: www.elsevier.com/locate/rse
+
+Leveraging past information and machine learning to accelerate land
+disturbance monitoring
+Su Ye *, Zhe Zhu , Ji Won Suh
+Department of Natural Resources and the Environment, University of Connecticut, Storrs, CT, USA
+
+A R T I C L E I N F O
+
+A B S T R A C T
+
+Edited by Marie Weiss
+
+Near real-time (NRT) monitoring of land disturbances holds great importance for delivering emergency aid,
+mitigating negative social and ecological impacts, and distributing resources for disaster recovery. Many past
+NRT techniques were built upon examining the overall change magnitude of a spectral anomaly with a pre­
+defined threshold, namely the unsupervised approach. However, their lack of fully considering spectral change
+direction, change date, and pre-disturbance conditions often led to low detection sensitivity and high commission
+errors, especially when only a few satellite observations were available at the early disturbance stage, eventually
+resulting in a longer lag to produce a reliable disturbance map. For this study, we developed a novel supervised
+machine learning approach guided by historical disturbance datasets to accelerate land disturbance monitoring.
+This new approach consisted of two phases. For the first phase, the supervised approach applied retrospective
+analysis on historical Harmonized Landsat Sentinel-2 (HLS) datasets from 2015 to 2021, combined with several
+open disturbance products. The disturbance model was constructed for each condition of consecutive anomaly
+number, with the aim of enhancing the specificity for delineating early-stage disturbance regions. Then, these
+stage-based models were applied for an NRT scenario to predict disturbance probabilities with 2022 HLS images
+incrementally on a weekly basis. To demonstrate the capability of this new approach, we developed an opera­
+tional NRT system incorporating both the unsupervised and supervised approach. Latency and accuracy were
+evaluated against 3000 samples that were randomly selected from the five most influential disturbance events of
+the United States in 2022, based on labels and disturbance dates interpreted from daily PlanetScope images. The
+evaluation showed that the supervised approach required 15 days (since the start of the disturbance event) to
+reach the plateau of its F1 curve (where most disturbance pixels are detected with high confidence), seven days
+earlier with roughly 0.2 F1 score improvement compared to the unsupervised approach (0.733 vs. 0.546 F1
+score). Further analysis showed the improvement was mainly due to the substantial decrease in commission
+errors (17.7% vs 44.4%). The latency component analysis illustrated that the supervised approach only took an
+average of 4.1 days to yield the first disturbance alert at its fastest daily updating speed, owing to its decreased
+sensitivity lag. This finding highlighted the importance of using past knowledge and machine learning to reduce
+detection delays for an NRT monitoring task.
+
+Keywords:
+Disturbance
+Near real-time
+Land change
+Time-series
+Latency
+Machine learning
+
+1. Introduction
+1.1. Near real-time monitoring
+Land disturbance, often defined as any discrete event that occurs
+outside the natural variability of the land (Zhu et al., 2020), could
+fundamentally alter land surface composition, condition, and cover
+types, consequently disrupting ecosystem functioning such as biodi­
+versity (Martínez-Ramos et al., 2016), productivity (Peters et al., 2013),
+
+carbon storage (Liang et al., 2014; Seidl et al., 2014). Land disturbances
+include natural hazards such as wildfire, flooding, tornado, and a variety
+of land-use shifts led by anthropogenic activities (Thornton et al., 2024;
+Zhu et al., 2020). There is a pressing need for mapping land disturbance
+events in a timely manner, which will hold great relevance for miti­
+gating their social and ecological impacts (Verbesselt et al., 2012) and
+delivering emergency aid to protect lives and infrastructure (Field et al.,
+2012).
+A large-scale Near Real-Time (NRT) monitoring of land disturbances
+
+* Corresponding author.
+E-mail address: remotesensingsuy@gmail.com (S. Ye).
+https://doi.org/10.1016/j.rse.2024.114071
+Received 24 October 2023; Received in revised form 20 January 2024; Accepted 18 February 2024
+0034-4257/© 2024 Elsevier Inc. All rights reserved.
+
+S. Ye et al.
+
+Remote Sensing of Environment 305 (2024) 114071
+
+has been long limited by a lack of timely satellite data acquisition until
+multiple global datasets became publicly available with reduced data
+latency and improved delivery service (Woodcock et al., 2008; Wulder
+et al., 2018). Earlier satellite-based NRT works were mainly based on
+coarse-resolution optical images such as the MODIS products, DETER
+project (Shimabukuro et al., 2006), the BFAST-monitor tool (Verbesselt
+et al., 2012), and later extended to the medium-resolution dataset
+owning to the free access policy of Landsat datasets, such as the Global
+Land Analysis and Discovery (GLAD) alerting system (Hansen et al.,
+2016), the Geobosques platform (Vargas et al., 2019) and Continuous
+Change Detection and Classification (CCDC)-adapted approaches (Pas­
+quarella et al., 2017; Ye et al., 2021b). The recent NRT studies incor­
+porate the Synthetic Aperture Radar (SAR) dataset (Bullock et al., 2022;
+Doblas et al., 2022; Eckerstorfer et al., 2019; Martinis et al., 2018) and 3m daily PlanetScope data (Francini et al., 2020), further reducing the
+observation lag by incorporating more frequent acquisition of satellite
+observations. On the other hand, some advanced approaches combined
+multiple sensors to shorten the time interval for collecting temporal
+observations (Reiche et al., 2018; Shang et al., 2022; Tang et al., 2023).
+For example, Shang et al. (2022) used the Harmonized Landsat Sentinel2 (HLS) dataset which combines four satellite sensors (Landsat 8,
+Landsat 9, Sentinel-2A, and Sentinel-2B) and successfully decreased the
+confirmation latency of a land disturbance to 35 days.
+Despite various input dataset types, NRT disturbance algorithms are
+generally categorized into two broad groups: the cover-based and the
+anomaly-based approaches. The cover-based approach was built on the
+land cover classification and cover category change (or called land cover
+conversion) (Andela et al., 2022; Diniz et al., 2015; Francini et al., 2020;
+Giglio et al., 2009; Hansen et al., 2016; Reiche et al., 2018, 2021; Vargas
+et al., 2019). This approach, typically the Global Land Analysis & Dis­
+covery (GLAD) Alert system (Hansen et al., 2016), constructs a landcover classification model based on historical or empirically selected
+samples, then applies the model to classify each newly collected image
+and to detect new disturbance pixels if these pixels have been consis­
+tently classified as altered land cover categories. The recent emerging
+studies for NRT land cover mapping (Brown et al., 2022; Yu et al., 2022)
+could be potentially leveraged for cover-based land disturbance moni­
+toring as well. The cover-based approach often requires an additional
+step for reducing data noise and normalizing input images (Reiche et al.,
+2018, 2021) or simply assumes no seasonality for their targeted cover
+(Hansen et al., 2016). If a disturbance only induces within-type surface
+change (or named as cover condition change), such as insect disturbance
+and drought, the cover-based approach might fail to alert the distur­
+bance. Some advanced cover-based methods generated soft classifica­
+tion outputs as a proxy, such as cover probabilities (Reiche et al., 2018,
+2021) or cover fractions (Vargas et al., 2019), with an aim to address
+subtle change as a “continuous” variable (e.g., forest loss). Nevertheless,
+these methods were only successful in a relatively simple scenario for a
+two-category classification scheme (e.g., forest vs. non-forest) so far.
+The anomaly-based approach detects early disturbance signals by
+discriminating recent spectral anomalies from time-series dataset (Ols­
+son et al., 2016; Pasquarella et al., 2017; Shang et al., 2022; Tang et al.,
+2019; Verbesselt et al., 2012; Ye et al., 2021a). The anomaly-based
+approach was often achieved without the necessity of tackling land
+cover information. This approach first builds a spectral baseline model
+by fitting historical time-series datasets from a stable period, and then
+continuously examines if the newly collected satellite observation rea­
+ches a spectral difference over a predefined threshold against its pre­
+dicted reflectance. The new disturbance event will be confirmed if the
+minimum number of consecutive anomalies (namely “peek window”) is
+satisfied. The anomaly-based approach could exclude such noises as data
+seasonality and other natural variations by incorporating cyclic trends
+and long-term trends into the baseline model. Also, benefiting from
+directly detecting change magnitudes, the anomaly-based approach is
+capable of detecting subtle disturbances that do not directly alter land
+cover types (Yang et al., 2022; Ye et al., 2021b).
+
+Most cover-based or anomaly-based techniques require collecting a
+minimum number of consecutive observations (conse) for disturbance
+confirmation (e.g., conse = 6 in most CCDC-like approaches), as the
+temporal stability of a disturbance signal aids its differentiation from
+noisy signals. The setting of conse is practically controlled by the user
+through algorithm configuration (Bullock et al., 2022). Arguably, it is
+common to employ less-than-required satellite observations for early
+disturbance alerting (Shang et al., 2022; Ye et al., 2021a), yet fewer
+post-disturbance observations for decision-making come at the cost of
+substantially increased commission errors. For example, Bullock et al.
+(2022) showcased over 80% commission errors in the initial 50 days
+since the disturbance occurrence date based on the sample-based
+agreement; likewise, Shang et al. (2022) reported over 80% commis­
+sion errors when only one or two anomaly observations were identified.
+This was because these techniques discriminated disturbance signals
+only relying on their relatively higher overall change magnitudes. When
+the post-disturbance data collection is short, the anomalies are more
+likely attributed to ephemeral and noisy signals (e.g., phenological
+variation, short-term weather extremes, and even data noise), thereby
+compromising the detection accuracy. Consequently, a long collection of
+post-disturbance observations is still a must for most operational man­
+agement tasks, if an NRT disturbance map with an acceptable commis­
+sion rate is expected.
+This study aims to develop a new supervised anomaly-based
+approach to reduce detection latency and at the same time enhance
+the detection accuracy. The new approach was inspired by Retrospective
+Chart Review (RCR), a popular type of medical research design in which
+pre-recorded, patient-centered datasets are used to examine clinical
+characteristics (Gill and Kaplan, 2021; Kaji et al., 2014; Vassar and
+Matthew, 2013). One notable advantage of RCR is that it is easier to
+access conditions where there is a long latency from the initial exposure
+and the patient’s diagnosis (Hess, 2004) so that the early symptoms
+could be retrospectively identified. The valuable information gathered
+from RCR could be further applied to guide subsequent prospective
+studies. Similarly, the recent availability of numerous land cover data­
+sets and disturbance products (Chuvieco et al., 2019; Johnson and
+Wittwer, 2008; Latifovic et al., 2016; Rollins, 2009) as well as freely
+accessed historical satellite images have enabled us to gain insights into
+early disturbance signals of a disturbance event whose occurrence might
+be confirmed a lot later. Specifically, we are allowed to design methods
+to effectively extract its early-stage spectral and temporal features from
+historical time series, which can be further leveraged to construct ma­
+chine learning models. With enhanced model specificity and better
+capability to differentiate noise guided by well-recorded disturbance
+event information, it is expected that retrospective disturbance analysis
+will improve both timeliness and accuracy against the current anomalybased approaches dominated by empirical thresholding. To our knowl­
+edge, historical datasets and analyses have not been systematically
+explored yet for the NRT disturbance mapping tasks. It is still unclear
+what disturbance predictors are extracted from satellite time series and
+how disturbance models are constructed for monitoring a variety of land
+disturbances at their different lag stages.
+1.2. Lag components
+For this study, the monitoring latency is viewed as an intricacy
+impacted by five lag components, i.e., observation, data, sensitivity,
+confirmation, and production lag, from input, algorithm, and produc­
+tion perspectives (Fig. 1). Assessing different proportions of lag com­
+ponents can provide potential treatments for accelerating disturbance
+alerting. Note that compared to Fig. 1 of Bullock et al. (2022), the as­
+sessments of sensitivity and production lags are newly proposed for this
+study.
+The input latency is mainly affected by observation and data lags. An
+observation lag refers to the time interval between the disturbance
+occurrence and when the sensor collects the first clear observation,
+2
+
+

@@ -1,0 +1,218 @@
+i An update to this article is included at the end
+
+Remote Sensing of Environment 238 (2020) 111116
+
+Contents lists available at ScienceDirect
+
+Remote Sensing of Environment
+journal homepage: www.elsevier.com/locate/rse
+
+Continuous monitoring of land disturbance based on Landsat time series
+a,b,⁎
+
+a,b
+
+Zhe Zhu
+, Junxue Zhang
+Congliang Zhoub
+
+c
+
+b
+
+, Zhiqiang Yang , Amal H. Aljaddani , Warren B. Cohen
+
+d,e
+
+b
+
+, Shi Qiu ,
+
+T
+
+a
+
+Department of Natural Resources and the Environment, University of Connecticut, Storrs, CT 06269, United States
+Department of Geosciences, MS 1053, Science Building 125, Texas Tech University, Lubbock, TX 79409, United States
+USDA Forest Service, RMRS Research Station, 507 25th Street, Ogden, UT 84401, United States
+d
+Department of Forest Ecosystems and Society, Oregon State University, Corvallis, OR 97331, United States
+e
+Pacific Northwest Research Station, U.S. Forest Service, Corvallis, OR 97331, United States
+b
+c
+
+ARTICLE INFO
+
+ABSTRACT
+
+Keywords:
+COLD
+Land disturbance
+Change detection
+Time series
+Landsat
+Near real-time
+
+We developed a new algorithm for COntinuous monitoring of Land Disturbance (COLD) using Landsat time
+series. COLD can detect many kinds of land disturbance continuously as new images are collected and provide
+historical land disturbance maps retrospectively. To better detect land disturbance, we tested different kinds of
+input data and explored many time series analysis techniques. We have several major observations as follows.
+First, time series of surface reflectance provides much better detection results than time series of Top-OfAtmosphere (TOA) reflectance, and with some adjustments to the temporal density, time series from Landsat
+Analysis Ready Data (ARD) is better than it is from the same Landsat scene. Second, the combined use of spectral
+bands is always better than using a single spectral band or index, and if all the essential spectral bands have been
+employed, the inclusion of other indices does not further improve the algorithm performance. Third, the remaining outliers in the time series can be removed based on their deviation from model predicted values based
+on probability-based thresholds derived from normal or chi-squared distributions. Fourth, model initialization is
+pivotal for monitoring land disturbance, and a good initialization stability test can influence algorithm performance substantially. Fifth, time series model estimation with eight coefficients model, updated for every single
+observation, based on all available clear observations achieves the best result. Sixth, a change probability of 0.99
+(chi-squared distribution) with six consecutive anomaly observations and a mean included angle < 45° to
+confirm a change provide the best results, and the combined use of temporally-adjusted Root Mean Square Error
+(RMSE) and minimum RMSE is recommended. Finally, spectral changes (or “breaks”) contributed from vegetation regrowth should be excluded from land disturbance maps. The COLD algorithm was developed and calibrated based on all these lessons learned above. The accuracy assessment shows that COLD results were accurate for detecting land disturbance, with an omission error of 27% and a commission error of 28%.
+
+1. Introduction
+Land disturbances such as stress, wind, hydrology, debris, harvest,
+mechanical, and fire, occur on the Earth's surface with high temporal
+and spatial variability (Cohen et al., 2016; Grimm et al., 2008; Grogan
+et al., 2015; Hansen et al., 2013; Kennedy et al., 2015; Mildrexler et al.,
+2009; Senf et al., 2015; Turner, 2010). It is a key component of ecological systems that affects terrestrial ecosystem at a wide range of
+scales. The spatial and temporal patterns of land disturbances are
+changing rapidly. For example, large fires are occurring more frequently in many parts of the world (Kasischke and Turetsky, 2006;
+Marlon et al., 2009; Westerling et al., 2006; Westerling et al., 2011),
+
+⁎
+
+even including tundra in Alaska (Hu et al., 2010; Mack et al., 2011;
+Racine et al., 2004). The hurricane activity in recent years also increased dramatically in the Atlantic (Goldenberg et al., 2001; Saunders
+and Lea, 2008), with an increasing destructiveness trend (Emanuel,
+2005). Beetle infestation has been more severe and extensive than in
+the past for forests located at higher elevations in western North
+America, which has changed the forest fragmentation patterns and
+carbon budgets significantly (Coops et al., 2010; Hicke et al., 2012;
+Meigs et al., 2015). Mechanical disturbances caused by human activities, such as deforestation, reforestation/afforestation, agricultural
+expansion/intensification, and urbanization, are increasing at an unprecedented rate, which accounted for 60% of all land changes (Song
+
+Corresponding author at: Department of Natural Resources and the Environment, University of Connecticut, Storrs, CT 06269, United States.
+E-mail address: zhe@uconn.edu (Z. Zhu).
+
+https://doi.org/10.1016/j.rse.2019.03.009
+Received 3 November 2018; Received in revised form 28 February 2019; Accepted 6 March 2019
+Available online 13 March 2019
+0034-4257/ © 2019 Elsevier Inc. All rights reserved.
+
+Remote Sensing of Environment 238 (2020) 111116
+
+Z. Zhu, et al.
+
+et al., 2018). On the other hand, land disturbances caused by natural
+disasters threaten human life, property, and can have staggering effects
+on human well-being and economic costs. Between 1980 and 2004, a
+total of two million people were killed by around 7000 natural disasters, and the direct economic damage from these natural disasters is
+estimated around 1 trillion dollars (Stromberg, 2007).
+Land disturbance has been defined variously. Here, we define land
+disturbance as any discrete event that occurs outside the range of natural variability of land surface. Both abrupt changes such as harvest,
+mechanical, hydrology, fire, wind, and gradual changes (or stress), such
+as disease, insects, drought are our targeted land disturbance types.
+Unlike most of the other studies that assume all land disturbances will
+have an impact of reduced vegetation (Cohen et al., 2018; Healey et al.,
+2018; Milesi et al., 2003), we do not have this assumption in our definition. This is because some of the land disturbances, such as mechanical changes, wind, hydrology, and fire in non-vegetated areas, do
+not necessarily reduce vegetation volume. Moreover, regular agricultural practice is not defined as land disturbance, unless it is transformed to some other land use and land cover types or has undergone
+certain kinds of none repeated agricultural activities, such as changing
+crop type or lying fallow.
+Many algorithms have been developed for monitoring land change
+based on remotely sensed imagery (Franklin et al., 2015; Hansen and
+Loveland, 2012; Huang et al., 2018; Zhu and Woodcock, 2014b), but
+most of them are only focusing on land cover and land use change
+(target of change), with very few studies on disturbance (agent of
+change) (Zhu, 2017). Moreover, almost all disturbance studies are focused on forest disturbance (Cohen et al., 2016; Grogan et al., 2015;
+Hansen et al., 2016; Xin et al., 2013; Zhu et al., 2012), with very limited
+knowledge on disturbances that occur on non-forested areas. Another
+major issue is that most of these algorithms do not have the capability
+of monitoring disturbance in a continuous mode, and the disturbance
+information derived from these algorithms is less helpful to resource
+managers and policymakers.
+Recently, a Continuous Change Detection and Classification (CCDC;
+Zhu and Woodcock, 2014b) algorithm has been developed to monitor
+land cover change using all available Landsat data. The CCDC algorithm
+can detect a variety of land cover and land use changes continuously
+with high spatial and temporal accuracies (Pengra et al., 2016; Zhu,
+2017), but is reported to have relatively low producer's accuracy for
+identifying forest disturbance with relatively small change magnitude
+(Cohen et al., 2017). The CCDC algorithm was originally designed to
+detect land cover and land use changes that usually result in a large
+change magnitude. However, for forest disturbances with subtle spectral change (usually still the same forest cover type after the disturbance), such as beetle infestation and selective logging, CCDC is less
+helpful. On the other hand, many of the changes (or “breaks”) detected
+by CCDC do not necessarily correspond to land disturbances. For example, CCDC identifies a break if it deviates from its predicted statistical intervals, but for breaks caused by gradual condition changes, such
+as vegetation regrowth, there is no disturbance event associated with
+them. This kind of error reduces the user's accuracy of land disturbance
+substantially.
+Additionally, though most of the disturbance mapping algorithms
+were based on Surface Reflectance (SR), there were some studies that
+used Top-Of-Atmosphere (TOA) reflectance as well (Hansen et al.,
+2013; Potapov et al., 2012). According to our knowledge, no comprehensive study compares the performance of TOA reflectance and SR
+time series for mapping land disturbance. Moreover, the United States
+Geological Survey (USGS) has released the Landsat Analysis Ready Data
+(ARD) for facilitating time series analysis (Dwyer et al., 2018). The
+Landsat ARD can provide denser time series observations for “side-lap”
+regions located between overlapping Landsat scenes than observations
+from the same Landsat scene. Finally, recent studies demonstrated that
+the use of multiple spectral bands and indices could provide more accurate forest disturbance results from a supervised classifier (Cohen
+
+et al., 2018). However, there is no comprehensive study on which
+band/index or selections of bands/indices work best for disturbance
+detection algorithms that do not rely on training and classification.
+Therefore, it is of high interest and importance to explore what kind of
+input data (TOA reflectance vs. SR), which variable or selection of
+variable, and what temporal frequency (ARD vs. the same scene) would
+provide the best land disturbance detection results.
+In this study, we describe a COntinuous monitoring of Land
+Disturbance (COLD) algorithm that is developed upon the Continuous
+Change Detection and Classification (CCDC) algorithm (Zhu and
+Woodcock, 2014b; Zhu et al., 2015b; Zhu et al., 2016), with the objective of providing large-scale, continuous, and accurate detection of
+land disturbance with Landsat time series. Specifically, we will (i)
+identify the best time series input for detecting land disturbance; (ii)
+develop and calibrate the land disturbance detection algorithm based
+on a well-interpreted reference dataset; and (iii) remove “breaks” that
+are disturbance irrelevant.
+2. Study area and data
+2.1. Study area
+Our study area includes a total of 180 Thiessen Scene Areas (TSAs)
+that are defined as the non-overlapping portions of individual frames
+(Kennedy et al., 2010). These 180 TSAs are selected from 442 TSAs
+covering the conterminous US based on a stratified sampling strategy
+designed for selecting a higher proportion of TSAs from forested areas
+(Fig. 1) (Cohen et al., 2016). Admittedly, our study areas are more
+forest-oriented, but considering the large amounts of forest disturbance
+in the US, it is less of an issue. Actually, if we calculate the land cover
+area proportions of all 180 TSAs based on the 2006 National Land
+Cover Database (NLCD) cover map (Fry et al., 2011), forest accounts < 40% of the land areas, with other > 60% of land that are
+covered by agriculture, shrubland, herbaceous, wetland, water, developed, and barren land. Another reason for picking these TSAs as our
+study area is because a total of 7200 Landsat reference samples across
+all land types have already been interpreted by experts from United
+States Forest Service (USFS) to estimate forest disturbance (Cohen et al.,
+2016). According to our knowledge, this is the only publicly available
+dataset that provides a high spatial resolution (30-meter) disturbance
+information at an annual timescale for a relatively large area.
+2.2. Reference data
+Within each of the 180 TSAs, 40 Landsat plots (30-meter Landsat
+pixels) were selected based on a simple random strategy, and a sample
+size of 7200 Landsat plots have been selected as our reference data, in
+which over half of them are non-forested and have been fully interpreted for cover and change. These datasets were previously interpreted
+for estimating forest disturbance based on the Landsat time series visualization and disturbance data collection software — TimeSync
+(Cohen et al., 2010). This tool provides a series of “image chips” (a
+subset of images) around a Landsat plot of interest (30-meter square), as
+well as the time series graphical plots, or temporal trajectories to help
+with interpreting the occurrence of disturbance. Both spectral bands
+and a variety of indices can be used to view or plot for the time series
+and the “image chips”. For each disturbance event, the causal agent
+classes such as Harvest, Fire, Stress, Wind, Mechanical, Hydrology, and
+Other (Fig. 2B) were interpreted in TimeSync with help from Google
+Earth high spatial resolution images and a variety of ancillary data.
+Cohen et al. (2016) have analyzed the disturbance magnitude for this
+reference data, in which majority of the disturbances have relative
+spectral changes less than 50%, and the accumulated tree cover changes
+from these disturbances are generally lower than 50%.
+The Landsat plots were interpreted for each year, and a time range
+was provided for each observed disturbance. For example, if a
+2
+
+

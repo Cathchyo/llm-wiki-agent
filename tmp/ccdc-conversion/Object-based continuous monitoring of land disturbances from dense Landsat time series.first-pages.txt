@@ -1,0 +1,221 @@
+Remote Sensing of Environment 287 (2023) 113462
+
+Contents lists available at ScienceDirect
+
+Remote Sensing of Environment
+journal homepage: www.elsevier.com/locate/rse
+
+Object-based continuous monitoring of land disturbances from dense
+Landsat time series
+Su Ye a, *, Zhe Zhu a, Guofeng Cao b
+a
+b
+
+Department of Natural Resources and the Environment, University of Connecticut, Storrs, CT, USA
+Department of Geography, University of Colorado Boulder, Boulder, CO, USA
+
+A R T I C L E I N F O
+
+A B S T R A C T
+
+Edited by Marie Weiss
+
+An accurate mapping of land disturbances with regard to their timing and locations is the prerequisite for the
+success of downstream disturbance characterization. This study introduces and tests a novel approach that in­
+tegrates a spatial perspective into the dense Landsat time series analysis, called “Object-Based COntinuous
+monitoring of Land Disturbance” (OB-COLD). The new algorithm is based on the recognition that the pixels
+under effects of the same disturbance event often present similar spectral change concurrently in a short time;
+such pixels experiencing concurrent change could be grouped as an analytic spatial unit, namely “change object”.
+OB-COLD first generates a change-magnitude snapshot every 60 days by applying per-pixel time series analysis to
+measure spectral change history. Then, an object-based change analysis is applied for each time-stamped
+snapshot: two levels of change objects are generated through over-segmentation and region merging; the
+changing area is determined by examining three object-level properties derived at different scales: the average
+change magnitude, the pre-change cover type, and the object size. Lastly, OB-COLD reconstructs model co­
+efficients for each temporal segment based on the temporal breaks indicated by new snapshot-based change
+maps. We tested the new algorithm using 3000 randomly selected reference sample plots and eight Landsat ARD
+tiles across the continental United States. The accuracy assessment suggests that OB-COLD achieved 76.9%
+producer’s accuracy, which is significantly higher than the per-pixel time series algorithm (i.e., COLD) (16.3
+percentage increase) while keeping a comparable user’s accuracies (58.7% vs. 57.8%). The quantitative and
+qualitative evaluations both suggest that OB-COLD could significantly reduce omission errors, particularly for
+stress disturbances. Most commission errors (73%) are attributed to agricultural practices and climate variability.
+The proposed algorithm is computationally scalable to large-scale spatiotemporal datasets with advanced
+cyberinfrastructure resources, holding great potential as the base detection algorithm for the next generation of
+land disturbance products.
+
+Keywords:
+Land disturbance
+Change detection
+Time series
+Object-based
+Multiscale image analysis
+Spatiotemporal
+
+1. Introduction
+Land disturbance, not limited to forested regions, can be defined as
+any event that is relatively discrete in time and space that disrupts the
+structure of an ecosystem, community, or population (Newman, 2019;
+White and Pickett, 1985). Land disturbances, purportedly driven by
+anthropogenic activities and recent climatic warming, have been
+documented over large parts of the globe with an increase in frequency
+and severity (Dale et al., 2001; Seidl et al., 2017), yielding significant
+impacts on the carbon cycle (Liang et al., 2014; Seidl et al., 2014),
+biodiversity (Martínez-Ramos et al., 2016), water quality (Carey et al.,
+2011) and landscape composition (Danneyrolles et al., 2019). Timely
+
+and accurate mapping of land disturbance events is of enormous
+importance to ecologists and forest managers, allowing for a better
+understanding of ecosystem-climate interactions and improved land
+resource management (Cohen et al., 2016; Rogan and Miller, 2006; Senf
+et al., 2017; Senf and Seidl, 2021). Remote sensing technology, typically
+the medium-resolution time series analysis, has been widely used for
+detecting a variety of land disturbances by identifying a temporal span
+of spectral anomaly relative to its natural variability (Coops et al., 2020;
+Hermosilla et al., 2019; Schug et al., 2018; Villarreal et al., 2016; Yin
+et al., 2020; Zhu et al., 2019). A satellite-based disturbance investigation
+project is typically comprised of two components: 1) mapping of
+disturbed region and timing (Cohen et al., 2018; Huang et al., 2010; Zhu
+
+* Corresponding author.
+E-mail address: remotesensingsuy@gmail.com (S. Ye).
+https://doi.org/10.1016/j.rse.2023.113462
+Received 19 July 2022; Received in revised form 13 January 2023; Accepted 16 January 2023
+Available online 27 January 2023
+0034-4257/© 2023 Elsevier Inc. All rights reserved.
+
+S. Ye et al.
+
+Remote Sensing of Environment 287 (2023) 113462
+
+et al., 2020); 2) characterizing disturbance agents (Baumann et al.,
+2014; Kennedy et al., 2015; Zhang et al., 2022), severity (Rodman et al.,
+2021), or recovery (White et al., 2022). This paper is concerned with the
+first component, the process of detecting disturbances, which provides
+essential base maps for downstream disturbance characterization.
+To date, numerous algorithms have been developed to map distur­
+bances from Landsat time-series dataset (Zhu, 2017). COntinuous
+monitoring of Land Disturbances (COLD), the latest version of the
+Continuous Change Detection and Classification (CCDC) algorithm
+tailored for land disturbance mapping, is a representative approach that
+makes it feasible to detect a variety of land disturbances based upon all
+available Landsats 4–8 data (herein named as “dense time series”, Zhu
+et al., 2020). COLD or all CCDC-like algorithms successively compare
+model forecasts and actual observations and identifies breaks if the
+discrepancies between new observations and model predictions persist
+(Zhu et al., 2020; Zhu and Woodcock, 2014a), which have been widely
+used for mapping coastal tidal wetland dynamics (Yang et al., 2022),
+land disturbance agents (Qiu et al., 2022), nighttime light change (Li
+et al., 2022) and forest dynamics (Healey et al., 2018).
+While COLD and other popular time-series approaches, such as
+LandTrendr (Kennedy et al., 2010), BFAST (Verbesselt et al., 2010), and
+VCT (Huang et al., 2010), have greatly enhanced our ability for mapping
+land change, these methods adhere to using pixels as independent
+spatial units for analysis, focusing on capturing obvious temporal
+anomaly or breaks based upon single-pixel-based time series. The major
+downside for such-like approaches is that they often suffer a high
+omission error rate for the myriad of subtle disturbances (e.g., insect,
+drought) that are characterized by insignificant spectral change lower
+than their pre-defined magnitude threshold (Cohen et al., 2017; Ye et al.,
+2021b; Zhu et al., 2019). Even for the dramatic disturbances that lead to
+land cover conversion (e.g., agricultural expansion and urbanization),
+per-pixel approaches may fail to delineate the full extent of a
+disturbance-affected region that often presents heterogeneous change
+owing to numerous geographically varying factors such as severity, predisturbance conditions, and topography. Spatial-contextual informa­
+tion, such as patch size and change adjacency, could provide new
+powerful metrics for discriminating subtle disturbances and enhance
+detection completeness through a consideration of spatial autocorrela­
+tion for event-induced spectral change. To incorporate spatial infor­
+mation into temporal analysis, several studies applied a simple spatial
+filtering for post-processing disturbance maps (Pasquarella et al., 2017;
+Ye et al., 2021b) but often only achieve a small degree of map refine­
+ment (Ye et al., 2021b). More sophisticated is a group of spatial-window
+techniques that uses a focal operation to preprocess each original sat­
+ellite image and then applies the time-series algorithm to the pre­
+processed images (Hamunyela et al., 2016; Meng et al., 2021). For
+example, Hamunyela et al. (2016) normalized each pixel by the median
+value of the neighboring pixels whose vegetation index values are above
+the 90th percentile of all pixels within a spatial window; such spatial
+normalization could significantly reduce signal noises from vegetation
+phenology for the subsequent time series analysis and advance the
+timing of capturing deforestation signals (Hamunyela et al., 2016). This
+study was targeted at forest disturbance, and the window size was
+determined through sensitivity analysis (Hamunyela et al., 2016);
+however, a single predefined spatial window size may not be sufficient
+for modeling generic land disturbances at a national or continental
+scales, which often manifests a diversity of cover types, spatial patterns
+and extents.
+Object-Based Image Analysis (OBIA) is an image processing frame­
+work which divides an image into clusters of adjacent pixels based on
+their spectral similarities, i.e., image objects (IOs), and then uses these
+IOs as the analytic unit (Blaschke, 2010) for the tasks such as image
+classification (Dronova et al., 2015; Gudex-Cross et al., 2017; Zhang
+et al., 2014, 2018), continuous surface parameter estimate (Laurent
+et al., 2013; Roelfsema et al., 2014), and pansharpening (Zhang et al.,
+2021). IOs can be used to represent an almost unlimited range of
+
+phenomena (Bian, 2007), from meaningful landscape entities to a lowerlevel grouping of spectrally similar pixels such as superpixel (e.g., Csil­
+lik, 2017), thereby leading to more flexibilities for modeling complex
+geographic phenomenon than the spatial-window techniques. OBIA first
+gained its popularity among the fine-resolution (< 5 m) applications
+under an H-resolution situation (Cleve et al., 2008; Holt et al., 2009),
+where landscape units of interest are significantly larger than the reso­
+lution cells (Strahler et al., 1986). Later studies utilized OBIA for
+medium-resolution images such as Landsat (Duveiller et al., 2008; Jobin
+et al., 2008; Vieira et al., 2012) and Sentinel-2 (Belgiu and Csillik, 2018;
+Djerriri et al., 2020), owing to its superiority for incorporating spatial
+properties such as object size and texture. These OBIA studies were
+mainly employed for land cover classification tasks, defining their ob­
+jects as landscape entities. Nevertheless, land disturbances not only alter
+landscape units in terms of their biophysical properties, but also – and
+more often – change their spatial borders. Therefore, it is unlikely to
+apply an object-oriented paradigm based on land cover objects for
+mapping land disturbances, unless targeted landscape boundaries
+remain unchanged during the change process (e.g., Yin et al., 2018).
+Alternatively, we could choose change objects as our analytic unit,
+rather than land cover objects. The consequences of a disturbance event,
+such as altering land condition, composition, soil property, or cover
+types, are often viewed as a spatial and temporal continuum (Kimmins,
+2004). If a pixel is experiencing spectral changes related to a distur­
+bance, it is reasonable to expect that its neighboring pixels present
+similar spectral changes in a synchronized manner, constituting a
+change object. This definition resolves the issue of changing object
+boundaries over time and facilitates integration of object-level change
+features, such as change object size and pre-change land types, for
+improved disturbance detection.
+Closing this gap, the change-object approach embarks on a similar
+challenge in GIScience concerning the representation of complex
+spatiotemporal objects across multiple spatiotemporal scales (Blaschke
+et al., 2014; Yuan, 2001). Particularly, enormous spectral details have
+been brought by within-event change heterogeneity, as well as
+increasing temporal density and spatial resolution of satellite images,
+calling for a hierarchical, multi-scale framework to decompose the
+spatiotemporal complexity. Fig. 1 conceptualizes a three-level hierarchy
+for perceiving a change process from a medium-resolution time-series
+dataset typically with a revisiting cycle of 3–8 days. Change superpixels
+(Level III) refer to a grouping of pixels that share common spectral
+change in a short interval (e.g., a month) under the effects of a process,
+representing the most detailed spatiotemporal object representation.
+The adjacent change superpixels within the same time intervals are
+further aggregated into a change patch (Level II), forming a continuous
+region affected by the change process at a coarser spatial scale. A
+change-process object (Level I) is the total area affected by the change
+process, which sometimes necessitates an ensemble of change infor­
+mation from several time periods (such as one to several years). Changeprocess object could be created by segmenting intermediate change
+measurement maps at an interval of multiple years (Gómez et al., 2011)
+or connecting adjacent pixels from annual pixel-based disturbance maps
+(Hermosilla et al., 2015; Kennedy et al., 2015; Qiu et al., 2022), and was
+commonly employed as the object unit for the disturbance character­
+ization. On the contrary, change objects at a fine spatiotemporal scale
+are more practically useful at the detection stage which aims at delin­
+eating accurate spatial and temporal change boundaries, particularly to
+the CCDC-like approaches that were established to provide intra-annual
+change information. Besides, a fine temporal grain for monitoring can
+help reduce the chance of misidentifying a mixed-disturbance object and
+holds great promise for timely alerting in a near real-time monitoring
+task. To our best knowledge, there are no established approaches yet for
+analyzing change objects at a fine temporal scale (e.g., monthly). Spe­
+cifically, two key impediments to such methodological development are:
+1) lacking a way for extracting change objects from a time-series
+perspective of perceiving a spectral change relative to its historical
+2
+
+

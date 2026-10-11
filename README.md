@@ -50,6 +50,43 @@ gemini      # reads GEMINI.md
 
 ## Usage
 
+### Python environment with uv
+
+The standalone scripts use Python dependencies; the coding-agent workflow above
+does not need an API key. Install [uv](https://docs.astral.sh/uv/getting-started/installation/),
+then run from the repository root:
+
+```bash
+uv sync --locked
+uv run python -X utf8 tools/health.py
+```
+
+`uv sync` creates `.venv` using Python 3.13 from `.python-version` and installs
+the versions in `uv.lock`. No virtual-environment activation is needed.
+The supported Python range is 3.11–3.13 (NetworkX 3.6 requires Python 3.11+).
+`-X utf8` makes Chinese text and symbols work in Windows terminals.
+Dependencies are maintained in `pyproject.toml`; after changing them, run
+`uv lock` and commit both files. `requirements.txt` is a legacy dependency list.
+
+`markitdown[all]`, `tqdm`, `networkx`, and the existing safe LiteLLM version
+range are included. The optional specialized PDF backends listed below are
+installed separately, for example `uv add pymupdf4llm`.
+Audio conversion also needs FFmpeg on `PATH`.
+
+For scripts that call an LLM, set `LLM_MODEL` and the matching provider's API
+key in your shell. For example, in PowerShell:
+
+```powershell
+$env:LLM_MODEL = "claude-3-5-sonnet-latest"
+$env:ANTHROPIC_API_KEY = "your-key"
+```
+
+Health checks and basic document conversion need no API key. Use
+`uv run python -X utf8 tools/pdf2md.py --help` or
+`uv run python -X utf8 tools/build_graph.py --help` to inspect options.
+Review wiki changes according to `AGENTS.md` before running scripts that write
+wiki pages or logs.
+
 All agents understand natural language and shorthand triggers:
 
 ```

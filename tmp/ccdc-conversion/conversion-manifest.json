@@ -1,0 +1,58 @@
+[
+  {
+    "file": "raw/ccdc_deep_learning/20140211_Continuous change detection and classification of land cover using all available Landsat data.md",
+    "date": "2014-02-11",
+    "date_basis": "first_online",
+    "pages": 20,
+    "bytes": 85116,
+    "source_pdf_sha256": "951794b880abd615c93919059793b733a709f34e7b419fe8215c8944a3c15e83"
+  },
+  {
+    "file": "raw/ccdc_deep_learning/20190313_Continuous monitoring of land disturbance based on Landsat time series.md",
+    "date": "2019-03-13",
+    "date_basis": "first_online",
+    "pages": 18,
+    "bytes": 112935,
+    "source_pdf_sha256": "920525216bcdff91fd832d09349d7c8f0da60def1d5805c32878c0fb5e6dba33"
+  },
+  {
+    "file": "raw/ccdc_deep_learning/20201105_A near-real-time approach for monitoring forest disturbance using Landsat time series： stochastic continuous change detection.md",
+    "date": "2020-11-05",
+    "date_basis": "first_online",
+    "pages": 17,
+    "bytes": 83259,
+    "source_pdf_sha256": "e0229b4a94525f5ce6d9ca513f2d3716553d8ee88c50b43cd71d55b640b7ab20"
+  },
+  {
+    "file": "raw/ccdc_deep_learning/20221007_Remote sensing of land change： A multifaceted perspective.md",
+    "date": "2022-10-07",
+    "date_basis": "first_online",
+    "pages": 20,
+    "bytes": 142142,
+    "source_pdf_sha256": "66483ca51f8e4c43578edac36f6135b2581275f0b92f1c3dd389670beb41fe34"
+  },
+  {
+    "file": "raw/ccdc_deep_learning/20230127_Object-based continuous monitoring of land disturbances from dense Landsat time series.md",
+    "date": "2023-01-27",
+    "date_basis": "first_online",
+    "pages": 15,
+    "bytes": 90405,
+    "source_pdf_sha256": "70deb9fe8342029ce519790200265cb282f3ea024fcddf900bbd1fee9b1a81c9"
+  },
+  {
+    "file": "raw/ccdc_deep_learning/202405_Leveraging past information and machine learning to accelerate land disturbance monitoring.md",
+    "date": "2024-05",
+    "date_basis": "journal_issue",
+    "pages": 15,
+    "bytes": 82939,
+    "source_pdf_sha256": "e2a403b45488c20258934e55f1ea3896fc6fffc5a61b4dfea5fd11e585848a30"
+  },
+  {
+    "file": "raw/ccdc_deep_learning/20260506_Near-real-time mapping for causal agents of forest disturbances in China using harmonized Landsat and Sentinel-2 dataset.md",
+    "date": "2026-05-06",
+    "date_basis": "first_online",
+    "pages": 16,
+    "bytes": 99670,
+    "source_pdf_sha256": "e6055c5e288458a9f0d329088f9c15d9df70f13303130f0bc43dacbac29e14ae"
+  }
+]
