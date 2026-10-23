@@ -50,6 +50,10 @@ gemini      # reads GEMINI.md
 
 ## Usage
 
+### 森林扰动论文
+
+新论文的 PDF 放入 [`raw/papers/forest-disturbance/`](raw/papers/forest-disturbance/)。使用 MarkItDown 转换后，同名 Markdown 保存在 PDF 旁，PDF 保留，已有 Markdown 不覆盖。目录和转换命令见[论文存放与转换说明](docs/forest-disturbance-papers.md)。
+
 ### Python environment with uv
 
 The standalone scripts use Python dependencies; the coding-agent workflow above

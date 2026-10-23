@@ -6,7 +6,7 @@ from markitdown import MarkItDown
 
 def convert_directory_to_md(input_dir: Path, delete_source: bool = False):
     """
-    Converts all files in a dictory to a Markdown format. Original files in the folder will be deleted.
+    Convert files to Markdown beside each original, skipping existing outputs.
     :param input_dir: str
         The Path object pointing to the directory to process.
     :param delete_source: bool = False
@@ -30,11 +30,15 @@ def convert_directory_to_md(input_dir: Path, delete_source: bool = False):
 
         # convert filepath to md
         output_path = file_path.with_suffix(".md")
+        if output_path.exists():
+            tqdm.write(f"Skipping existing Markdown: {output_path.name}")
+            continue
         try:
             # convert
             result = md.convert(str(file_path))
             # save to .md
-            output_path.write_text(result.text_content, encoding="utf-8")
+            with output_path.open("x", encoding="utf-8") as output_file:
+                output_file.write(result.text_content)
             # optional remove original file
             if delete_source:
                 file_path.unlink()
@@ -62,7 +66,7 @@ def main(args):
 
 if __name__ == "__main__":
     """Command-line arguments."""
-    parser = argparse.ArgumentParser(description="Convert all files in a directory to Markdown and delete originals.")
+    parser = argparse.ArgumentParser(description="Convert files to Markdown beside the originals; skip existing Markdown outputs.")
     parser.add_argument(
         "--input_dir",
         type=str,

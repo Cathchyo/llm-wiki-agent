@@ -1,0 +1,2 @@
+# Preserve PDF bytes and display PDFs as binary files in diffs.
+*.pdf binary
