@@ -1,0 +1,30 @@
+{
+  "output": "C:\\personal\\llm-wiki-agent\\tmp\\pdfs\\农业工程与信息案例课程答辩-王圣杰-8分钟汇报稿.pdf",
+  "pages": 4,
+  "bytes": 222780,
+  "source_sha256": "83acddad09d61a8506cf80dd5f06c6573da0b666bec57e6b65042008f4cd97d9",
+  "text_matches_markdown": true,
+  "pages_checked": [
+    {
+      "page": 1,
+      "characters": 806,
+      "out_of_bounds_characters": 0
+    },
+    {
+      "page": 2,
+      "characters": 957,
+      "out_of_bounds_characters": 0
+    },
+    {
+      "page": 3,
+      "characters": 669,
+      "out_of_bounds_characters": 0
+    },
+    {
+      "page": 4,
+      "characters": 624,
+      "out_of_bounds_characters": 0
+    }
+  ],
+  "preview": "C:\\personal\\llm-wiki-agent\\tmp\\pdfs\\speech_pdf_qa\\contact-sheet.png"
+}
