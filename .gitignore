@@ -4,3 +4,5 @@ __pycache__/
 .env
 .env.*
 !.env.example
+/raw/blog/The components of agent memory _ Anthropic_files/
+/raw/sinc_v1.4.docx
